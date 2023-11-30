@@ -1,0 +1,16 @@
+{
+    "Plugins": [
+        {
+            "Type": "python",
+            "Name": "roah_tools",
+            "Info": {
+                "Types": {
+                    "roah_tools.RoahToolsPluginContainer": {
+                        "bases": ["pxr.Usdviewq.plugin.PluginContainer"],
+                        "displayName": "Roah Tools"
+                    }
+                }
+            }
+        }
+    ]
+}
