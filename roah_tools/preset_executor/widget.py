@@ -24,18 +24,25 @@ class OptionItem:
         if isinstance(self._member, bool):  # int より先に
             widget = QCheckBox(parent)
             widget.setText(self._memberName)
-            widget.setChecked(bool(self._member) if self._member is not None else False)
+            widget.setChecked(bool(self._member)
+                              if self._member is not None else False)
             return widget
         if isinstance(self._member, int):
             widget = QSpinBox(parent)
-            widget.setValue(int(self._member) if self._member is not None else 0)
+            widget.setMinimum(-0x80000000)
+            widget.setMaximum(0x7FFFFFFF)
+            widget.setValue(int(self._member)
+                            if self._member is not None else 0)
             return widget
         if isinstance(self._member, float):
             widget = QDoubleSpinBox(parent)
-            widget.setValue(float(self._member) if self._member is not None else 0)
+            widget.setMinimum(-1e8)
+            widget.setMaximum(1e8)
+            widget.setValue(float(self._member)
+                            if self._member is not None else 0)
             return widget
         return None
-    
+
     def setOptionValue(self, widget):
         if isinstance(widget, QLineEdit):
             setattr(self._module, self._memberName, widget.text())
@@ -43,7 +50,7 @@ class OptionItem:
             setattr(self._module, self._memberName, widget.value())
         elif isinstance(widget, QCheckBox):
             setattr(self._module, self._memberName, widget.isChecked())
-    
+
     @property
     def labelText(self):
         if isinstance(self._member, bool):
@@ -56,7 +63,8 @@ class PresetItem:
     def __init__(self, path: str):
         self._path = path
         print(f"Import: {path}")
-        self._spec = importlib.util.spec_from_file_location(os.path.splitext(path)[0], path)
+        self._spec = importlib.util.spec_from_file_location(
+            os.path.splitext(path)[0], path)
         self._module = importlib.util.module_from_spec(self._spec)
         self._spec.loader.exec_module(self._module)
         self._name = os.path.basename(self._path)
@@ -77,19 +85,19 @@ class PresetItem:
     @property
     def displayData(self) -> str:
         return self._name
-    
+
     @property
     def toolTipData(self) -> str:
         return self._doc
-    
+
     @property
     def options(self) -> list:
         return self._options
-    
+
     @property
     def title(self) -> str:
         return self._name
-    
+
     @property
     def document(self) -> str:
         return self._doc
@@ -112,7 +120,7 @@ class OptionsWidget(QWidget):
             widget = option.createWidget(self)
             self._layout.addRow(labelText, widget)
             self._widgets.append((option, widget))
-    
+
     def updateOptionValues(self):
         for opt, widget in self._widgets:
             opt.setOptionValue(widget)
@@ -187,7 +195,8 @@ class PresetExecutor(QDockWidget):
                 if oldWidget:
                     oldWidget.deleteLater()
                 if preset:
-                    self._optionWidget = OptionsWidget(self._ui.saOptions, preset.options)
+                    self._optionWidget = OptionsWidget(
+                        self._ui.saOptions, preset.options)
                     self._ui.saOptions.setWidget(self._optionWidget)
                     self._ui.leTitle.setText(preset.title)
                     self._ui.lbDocument.setText(preset.document)
